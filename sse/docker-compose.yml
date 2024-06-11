@@ -1,0 +1,41 @@
+version: '1.0'
+
+services:
+  app:
+    image: sse-test:1.0.0
+    networks:
+      - network
+    ports:
+      - "8080:8080"
+    restart: always
+    mem_limit: 1024m
+
+
+  prometheus:
+    image: prom/prometheus:latest
+    restart: always
+    container_name: prometheus
+    networks:
+      - network
+    ports:
+      - "9090:9090"
+    depends_on:
+      - app
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana:latest
+    restart: unless-stopped
+    networks:
+      - network
+    depends_on:
+      - prometheus
+    ports:
+      - 3000:3000
+    volumes:
+      - ./grafana:/var/lib/grafana
+
+networks:
+  network:
+    driver: bridge

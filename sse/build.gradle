@@ -1,0 +1,57 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.3.0'
+    id 'io.spring.dependency-management' version '1.1.5'
+    id 'com.palantir.docker' version "0.36.0"
+}
+
+group = 'me.wane'
+version = '0.0.1'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+docker {
+    println(tasks.bootJar.outputs.files)
+
+
+    //이미지 이름
+    name "sse-test:1.0.0"
+
+    //어떤 Dockerfile을 사용할지
+    dockerfile file("../Dockerfile-spring")
+
+    //어떤 파일들을 Dockerfile에 복사할 것인가
+    files tasks.bootJar.outputs.files
+
+//    Dockerfile에 전달할 인자
+    buildArgs(['JAR_FILE' : tasks.bootJar.outputs.files.singleFile.name])
+}

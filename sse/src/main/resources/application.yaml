@@ -1,0 +1,27 @@
+spring.application.name: sse
+
+
+spring:
+  mvc:
+    async:
+      request-timeout: 5000
+
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+server:
+  tomcat:
+    mbeanregistry:
+      enabled: true
+    threads:
+      max: 50
+    max-connections: 2
+    keep-alive-timeout: 5s
+    connection-timeout: 5s
+  servlet:
+    session:
+      timeout: 5s
